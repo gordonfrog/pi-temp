@@ -19,7 +19,7 @@ public class TempLogger {
     @Autowired
     TemperatureRepository temperatureRepository;
     @Value("${interval}")
-    Long interval;
+    String interval;
 
     @PostConstruct
     public void getTemperature() throws InterruptedException {
@@ -39,7 +39,9 @@ public class TempLogger {
                 temperatureRepository.save(temperatureEntity);
                 System.out.println("Logged temp");
             }
-            Thread.sleep(interval);
+            long longInterval = 10000L;
+            try { longInterval = Long.getLong(interval); } catch (Exception e) {System.out.println("Interval parse exception setting to default 10sec.");}
+            Thread.sleep(longInterval);
         }
 
     }
