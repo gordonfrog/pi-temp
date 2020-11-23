@@ -19,7 +19,7 @@ public class TempLogger {
     @Autowired
     TemperatureRepository temperatureRepository;
     @Value("${interval}")
-    String interval;
+    Long interval;
 
     @PostConstruct
     public void getTemperature() throws InterruptedException {
@@ -27,7 +27,7 @@ public class TempLogger {
         while (true){
         W1Master w1Master = new W1Master();
 
-        System.out.println(w1Master);
+        System.out.println("w1Master: "+ w1Master);
 
             for (TemperatureSensor device : w1Master.getDevices(TemperatureSensor.class)) {
                 Double d = device.getTemperature(TemperatureScale.FARENHEIT);
@@ -37,11 +37,9 @@ public class TempLogger {
                 temperatureEntity.setTime(Timestamp.valueOf(LocalDateTime.now()));
 
                 temperatureRepository.save(temperatureEntity);
-                System.out.println("Logged temp");
+                System.out.println("Logged temp: "+temperatureEntity);
             }
-            long longInterval = 10000L;
-            try { longInterval = Long.getLong(interval); } catch (Exception e) {System.out.println("Interval parse exception setting to default 10sec.");}
-            Thread.sleep(longInterval);
+            if (interval != null && interval > 0L) Thread.sleep(interval); else Thread.sleep(5000L);
         }
 
     }
